@@ -9,23 +9,29 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class MainCommand implements BasicCommand {
     @Override
     public void execute(CommandSourceStack commandSourceStack, String[] strings) {
+        //Help message
         if(strings.length == 0) {
             commandSourceStack.getSender().sendMessage("Command options:\n" +
                     "/qpcc create <course> - creates a checkpoint in a parkour course\n" +
-                    "/qpcc counter_set <number> - sets the checkpoint counter used in checkpoint & hologram names");
-            return;
-        }
-        if(strings.length == 2 && strings[0].equals("create")) {
-            String courseName = strings[1];
+                    "/qpcc counter_set <number> - sets the checkpoint counter used in checkpoint & hologram names\n" +
+                    "/gpcc counter_get - prints the current counter value");
 
-            if(!(commandSourceStack.getSender() instanceof Player)) {
+            //Create subcommand
+        } else if(strings.length == 2 && strings[0].equals("create")) {
+            if (!(commandSourceStack.getSender() instanceof Player)) {
+                commandSourceStack.getSender().sendMessage("This command can only be used by players");
                 return;
             }
+
+            String courseName = strings[1];
+
 
             Player player = (Player) commandSourceStack.getSender();
             GameMode prevGamemode = player.getGameMode();
@@ -39,15 +45,15 @@ public class MainCommand implements BasicCommand {
                             courseName + "_" + QuickParkourCheckpointCreator.checkpointCounter + "%"
             );
 
+            //Tp player back where he was
             player.teleport(player.getLocation().add(0, -1.5, 0));
             player.setGameMode(prevGamemode);
 
             QuickParkourCheckpointCreator.checkpointCounter++;
             commandSourceStack.getSender().sendMessage("Successfully executed all the commands");
-            return;
-        }
 
-        if(strings.length == 2 && strings[0].equals("counter_set")) {
+            //Counter_set subcommand
+        } else if(strings.length == 2 && strings[0].equals("counter_set")) {
             try {
                 Integer.parseInt(strings[1]);
             } catch (NumberFormatException e) {
@@ -57,15 +63,24 @@ public class MainCommand implements BasicCommand {
 
             QuickParkourCheckpointCreator.checkpointCounter = Integer.parseInt(strings[1]);
             commandSourceStack.getSender().sendMessage("Successfully set the counter to " + QuickParkourCheckpointCreator.checkpointCounter);
-            return;
+
+            //Counter_get subcommand
+        } else if(strings.length == 1 && strings[0].equals("counter_get")) {
+            commandSourceStack.getSender().sendMessage("Current counter value is " + QuickParkourCheckpointCreator.checkpointCounter);
         }
+
+
         commandSourceStack.getSender().sendMessage("Invalid options");
 
     }
 
     @Override
     public Collection<String> suggest(CommandSourceStack commandSourceStack, String[] args) {
-        return BasicCommand.super.suggest(commandSourceStack, args);
+        if(args.length >= 1 && args.length <= 2)
+            return new ArrayList<>(Arrays.asList("create", "counter_set", "counter_get"));
+        else
+            return new ArrayList<>();
+
     }
 
     @Override
