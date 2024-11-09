@@ -1,4 +1,4 @@
-# Quick Parkour Checkpoint creator
+# Quick Parkour Checkpoint Creator
 
 A Paper plugin, that automates setting up Parkour course checkpoints, with holograms above them, like this one:
 
