@@ -12,7 +12,7 @@ It works by executing a couple of commands at once:
 - ***/dh create ... %parkour_current_checkpoint_hologram_<course_name>_<checkpoint_number>%*** <br>to create a hologram above the checkpoint, with its number (using Parkour's built-in support for PlaceholderAPI)
 # Usage
 The plugin's main command is ***/qpcc***:<br>
-- ***/qpcc create <course_name>***<br>creates a checkpoint for a Parkour course, with a hologram
+- ***/qpcc create <course_name>***<br>creates a checkpoint with a hologram, for specified Parkour course
 - ***/qpcc counter_set <checkpoint_number>***<br> sets the next checkpoint's number (use when you don't want to start with creating the first checkpoint)
 - ***/qpcc counter_get***<br> prints the next checkpoints number<br><br>
 I recommend binding the ***create*** command to a tool (e.g. by using Essential's power tool feature), to speed up the process even more.
