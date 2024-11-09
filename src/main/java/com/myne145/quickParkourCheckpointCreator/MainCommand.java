@@ -2,6 +2,10 @@ package com.myne145.quickParkourCheckpointCreator;
 
 import io.papermc.paper.command.brigadier.BasicCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
@@ -16,12 +20,15 @@ import java.util.Collection;
 public class MainCommand implements BasicCommand {
     @Override
     public void execute(CommandSourceStack commandSourceStack, String[] strings) {
-        //Help message
+
         if(strings.length == 0) {
-            commandSourceStack.getSender().sendMessage("Command options:\n" +
-                    "/qpcc create <course> - creates a checkpoint in a parkour course\n" +
-                    "/qpcc counter_set <number> - sets the checkpoint counter used in checkpoint & hologram names\n" +
-                    "/gpcc counter_get - prints the current counter value");
+
+            commandSourceStack.getSender().sendMessage("§bUse §7§o/qpcc help §r§b to list all the available commands");
+        } else if(strings.length == 1 && strings[0].equals("help")) {
+            commandSourceStack.getSender().sendMessage("§b§lQPCC HELP:§r\n" +
+                    "§8- §b/qpcc create §o<course>§r §8- §7creates a checkpoint with a hologram, for specified Parkour course\n" +
+                    "§8- §b/qpcc counter_set §o<number>§r §8- §7sets the next checkpoint's number (use when you don't want to start with creating the first checkpoint)\n" +
+                    "§8- §b/gpcc counter_get §8- §7prints the next checkpoints number");
 
             //Create subcommand
         } else if(strings.length == 2 && strings[0].equals("create")) {
@@ -50,28 +57,26 @@ public class MainCommand implements BasicCommand {
             player.setGameMode(prevGamemode);
 
             QuickParkourCheckpointCreator.checkpointCounter++;
-            commandSourceStack.getSender().sendMessage("Successfully executed all the commands");
+            commandSourceStack.getSender().sendMessage("§bSuccessfully executed all the commands!");
 
             //Counter_set subcommand
         } else if(strings.length == 2 && strings[0].equals("counter_set")) {
             try {
                 Integer.parseInt(strings[1]);
             } catch (NumberFormatException e) {
-                commandSourceStack.getSender().sendMessage("Not a number");
+                commandSourceStack.getSender().sendMessage("§bNot a number");
                 return;
             }
 
             QuickParkourCheckpointCreator.checkpointCounter = Integer.parseInt(strings[1]);
-            commandSourceStack.getSender().sendMessage("Successfully set the counter to " + QuickParkourCheckpointCreator.checkpointCounter);
+            commandSourceStack.getSender().sendMessage("§bSuccessfully set the counter to §r§8" + QuickParkourCheckpointCreator.checkpointCounter);
 
             //Counter_get subcommand
         } else if(strings.length == 1 && strings[0].equals("counter_get")) {
-            commandSourceStack.getSender().sendMessage("Current counter value is " + QuickParkourCheckpointCreator.checkpointCounter);
+            commandSourceStack.getSender().sendMessage("§bCurrent counter value is §r§8" + QuickParkourCheckpointCreator.checkpointCounter);
+        } else {
+            commandSourceStack.getSender().sendMessage("§bInvalid options");
         }
-
-
-        commandSourceStack.getSender().sendMessage("Invalid options");
-
     }
 
     @Override
