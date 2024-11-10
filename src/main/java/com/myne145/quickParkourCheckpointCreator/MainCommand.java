@@ -2,27 +2,35 @@ package com.myne145.quickParkourCheckpointCreator;
 
 import io.papermc.paper.command.brigadier.BasicCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static com.myne145.quickParkourCheckpointCreator.Qpcc.checkpointCounters
+        ;
 public class MainCommand implements BasicCommand {
+
     @Override
     public void execute(CommandSourceStack commandSourceStack, String[] strings) {
+        //Fix for executing the command from the console
+        if(commandSourceStack.getExecutor() == null || commandSourceStack.getSender() == null) {
+            commandSourceStack.getSender().sendMessage("This command can only be used by players");
+            return;
+        }
+
+        //Initialize the player
+        if(!checkpointCounters.containsKey(commandSourceStack.getExecutor().getUniqueId())) {
+            checkpointCounters.put(commandSourceStack.getExecutor().getUniqueId(), 1);
+        }
 
         if(strings.length == 0) {
-
             commandSourceStack.getSender().sendMessage("§bUse §7§o/qpcc help §r§b to list all the available commands");
         } else if(strings.length == 1 && strings[0].equals("help")) {
             commandSourceStack.getSender().sendMessage("§b§lQPCC HELP:§r\n" +
@@ -32,10 +40,10 @@ public class MainCommand implements BasicCommand {
 
             //Create subcommand
         } else if(strings.length == 2 && strings[0].equals("create")) {
-            if (!(commandSourceStack.getSender() instanceof Player)) {
-                commandSourceStack.getSender().sendMessage("This command can only be used by players");
-                return;
-            }
+//            if (!(commandSourceStack.getSender() instanceof Player)) {
+//                commandSourceStack.getSender().sendMessage("This command can only be used by players");
+//                return;
+//            }
 
             String courseName = strings[1];
 
@@ -44,22 +52,32 @@ public class MainCommand implements BasicCommand {
             GameMode prevGamemode = player.getGameMode();
 
             Bukkit.dispatchCommand(commandSourceStack.getSender(), "pa create checkpoint " + courseName);
+
+            //A dumb way to position the hologram
             player.setGameMode(GameMode.SPECTATOR);
             player.teleport(player.getLocation().add(0, 1.5, 0));
 
+            int currentCheckpoint = checkpointCounters.get(commandSourceStack.getExecutor().getUniqueId());
+
+            //Create hologram
             Bukkit.dispatchCommand(commandSourceStack.getSender(),
-                    "dh create " + courseName + "_checkpoint_1 %parkour_current_checkpoint_hologram_" +
-                            courseName + "_" + QuickParkourCheckpointCreator.checkpointCounter + "%"
+                    "dh create " + courseName + "_checkpoint_" + currentCheckpoint + " %parkour_current_checkpoint_hologram_" +
+                            courseName + "_" + currentCheckpoint + "%"
             );
+
+            //Center the hologram
+            Bukkit.dispatchCommand(commandSourceStack.getSender(),
+                    "dh center " + courseName + "_checkpoint_" + currentCheckpoint);
 
             //Tp player back where he was
             player.teleport(player.getLocation().add(0, -1.5, 0));
             player.setGameMode(prevGamemode);
 
-            QuickParkourCheckpointCreator.checkpointCounter++;
+            checkpointCounters.put(player.getUniqueId(), checkpointCounters.get(player.getUniqueId()) + 1);
+//            Qpcc.checkpointCounter++;
             commandSourceStack.getSender().sendMessage("§bSuccessfully executed all the commands!");
 
-            //Counter_set subcommand
+        //Counter_set subcommand
         } else if(strings.length == 2 && strings[0].equals("counter_set")) {
             try {
                 Integer.parseInt(strings[1]);
@@ -68,12 +86,16 @@ public class MainCommand implements BasicCommand {
                 return;
             }
 
-            QuickParkourCheckpointCreator.checkpointCounter = Integer.parseInt(strings[1]);
-            commandSourceStack.getSender().sendMessage("§bSuccessfully set the counter to §r§8" + QuickParkourCheckpointCreator.checkpointCounter);
+            checkpointCounters.put(commandSourceStack.getExecutor().getUniqueId(), Integer.parseInt(strings[1]));
+
+//            Qpcc.checkpointCounter = Integer.parseInt(strings[1]);
+            commandSourceStack.getSender().sendMessage("§bSuccessfully set the counter to §r§8" +
+                    checkpointCounters.get(commandSourceStack.getExecutor().getUniqueId()));
 
             //Counter_get subcommand
         } else if(strings.length == 1 && strings[0].equals("counter_get")) {
-            commandSourceStack.getSender().sendMessage("§bCurrent counter value is §r§8" + QuickParkourCheckpointCreator.checkpointCounter);
+            commandSourceStack.getSender().sendMessage("§bCurrent counter value is §r§8" +
+                    checkpointCounters.get(commandSourceStack.getExecutor().getUniqueId()));
         } else {
             commandSourceStack.getSender().sendMessage("§bInvalid options");
         }
@@ -81,8 +103,12 @@ public class MainCommand implements BasicCommand {
 
     @Override
     public Collection<String> suggest(CommandSourceStack commandSourceStack, String[] args) {
-        if(args.length >= 1 && args.length <= 2)
-            return new ArrayList<>(Arrays.asList("create", "counter_set", "counter_get"));
+        if(!commandSourceStack.getSender().hasPermission("qpcc.*")) {
+            return new ArrayList<>(); //prevent autocompletion if user doesnt have the permission
+        }
+
+        if(args.length == 0 || args.length == 1)
+            return new ArrayList<>(Arrays.asList("create", "counter_set", "counter_get", "help"));
         else
             return new ArrayList<>();
 
@@ -90,11 +116,11 @@ public class MainCommand implements BasicCommand {
 
     @Override
     public boolean canUse(CommandSender sender) {
-        return BasicCommand.super.canUse(sender);
+        return sender.hasPermission("qpcc.*");
     }
 
     @Override
     public @Nullable String permission() {
-        return BasicCommand.super.permission();
+        return "qpcc.*";
     }
 }

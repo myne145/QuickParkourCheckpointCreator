@@ -1,4 +1,4 @@
 name: QuickParkourCheckpointCreator
 version: '1.0-SNAPSHOT'
-main: com.myne145.quickParkourCheckpointCreator.QuickParkourCheckpointCreator
+main: com.myne145.quickParkourCheckpointCreator.Qpcc
 api-version: '1.21'
