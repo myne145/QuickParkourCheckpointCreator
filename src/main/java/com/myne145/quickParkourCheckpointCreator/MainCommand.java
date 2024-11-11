@@ -5,7 +5,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.Nullable;
 
@@ -36,7 +35,7 @@ public class MainCommand implements BasicCommand {
             commandSourceStack.getSender().sendMessage("§b§lQPCC HELP:§r\n" +
                     "§8- §b/qpcc create §o<course>§r §8- §7creates a checkpoint with a hologram, for specified Parkour course\n" +
                     "§8- §b/qpcc counter_set §o<number>§r §8- §7sets the next checkpoint's number (use when you don't want to start with creating the first checkpoint)\n" +
-                    "§8- §b/gpcc counter_get §8- §7prints the next checkpoints number");
+                    "§8- §b/qpcc counter_get §8- §7prints the next checkpoints number");
 
             //Create subcommand
         } else if(strings.length == 2 && strings[0].equals("create")) {

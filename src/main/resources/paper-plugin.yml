@@ -2,3 +2,12 @@ name: QuickParkourCheckpointCreator
 version: '1.0-SNAPSHOT'
 main: com.myne145.quickParkourCheckpointCreator.Qpcc
 api-version: '1.21'
+
+dependencies:
+  server:
+    DecentHolograms:
+      load: BEFORE
+      required: false
+    Parkour:
+      load: BEFORE
+      required: false

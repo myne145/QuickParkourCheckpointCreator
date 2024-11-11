@@ -2,7 +2,6 @@ package com.myne145.quickParkourCheckpointCreator;
 
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -14,7 +13,6 @@ import java.util.UUID;
 
 public final class Qpcc extends JavaPlugin implements Listener {
     public static LinkedHashMap<UUID, Integer> checkpointCounters = new LinkedHashMap<>();
-//    public static int checkpointCounter = 1;
     public static Plugin plugin;
 
     @Override
@@ -23,7 +21,6 @@ public final class Qpcc extends JavaPlugin implements Listener {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands commands = event.registrar();
             commands.register("qpcc", "QuickParkourCheckpointCreator main command", new MainCommand());
-            commands.register("quickparkourcheckpointcreator", "QuickParkourCheckpointCreator main command", new MainCommand());
         });
         getServer().getPluginManager().registerEvents(this, this);
         getLogger().info("Successfully enabled QuickParkourCheckpointCreator");
@@ -31,7 +28,7 @@ public final class Qpcc extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        getLogger().info("Successfully disabled QuickParkourCheckpointCreator");
     }
 
     @EventHandler
